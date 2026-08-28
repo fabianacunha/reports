@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O Lead Lento — Estudo de Comportamento das Imersões Alura (2024–2026)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12182B;
+    --ink-soft:#232B44;
+    --paper:#F5F1E6;
+    --paper-dim:#EAE4D4;
+    --amber:#CB9A46;
+    --amber-soft:#E8C989;
+    --clay:#A8462F;
+    --clay-soft:#E8D2C9;
+    --teal:#3E6B63;
+    --line: rgba(245,241,230,0.14);
+    --line-dark: rgba(18,24,43,0.12);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.display{font-family:'Fraunces',serif;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  p{max-width:66ch;}
+  a{color:inherit;}
+  img,canvas{max-width:100%;}
+
+  .hero{background:radial-gradient(120% 140% at 15% -10%, #1C2440 0%, var(--ink) 55%, #0D1120 100%);color:var(--paper);padding:5rem 6vw 4rem;position:relative;overflow:hidden;}
+  .hero::after{content:"";position:absolute; inset:0;background-image: repeating-linear-gradient(90deg, rgba(245,241,230,0.035) 0 1px, transparent 1px 120px);pointer-events:none;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;letter-spacing:.14em; text-transform:uppercase;font-size:.72rem; color:var(--amber-soft);display:flex; align-items:center; gap:.6rem;margin-bottom:1.6rem;}
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--amber-soft);display:inline-block;}
+  .hero h1{font-size:clamp(2.4rem, 5.4vw, 4.6rem);font-weight:600;line-height:1.04;max-width:17ch;margin:0 0 1.6rem;letter-spacing:-0.01em;}
+  .hero h1 em{font-style:italic; font-weight:300; color:var(--amber-soft);}
+  .hero .lede{font-size:1.15rem;max-width:58ch;color:#D8D4C4;font-weight:400;}
+  .hero-meta{display:flex; flex-wrap:wrap; gap:2.6rem;margin-top:3.2rem;padding-top:2rem;border-top:1px solid var(--line);}
+  .hero-meta div{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:#A9A491;text-transform:uppercase;letter-spacing:.06em;}
+  .hero-meta strong{display:block;font-family:'Fraunces',serif;font-size:1.5rem;color:var(--paper);font-weight:500;letter-spacing:0;text-transform:none;margin-top:.2rem;}
+
+  .ribbon-wrap{background:var(--ink); padding:2.6rem 6vw 5rem; position:relative;}
+  .ribbon-label{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:#8B87A0;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem;}
+  .ribbon{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:3px;align-items:end;height:150px;border-bottom:1px solid var(--line);padding-bottom:2px;}
+  .rib-bar{background:linear-gradient(180deg, var(--amber-soft), var(--amber));border-radius:2px 2px 0 0;position:relative;cursor:default;transition:opacity .15s;}
+  .rib-bar:hover{opacity:.72;}
+  .rib-bar.y2024{background:linear-gradient(180deg,#9AA3C4,#6C74A0);}
+  .rib-bar.y2025{background:linear-gradient(180deg,var(--amber-soft),var(--amber));}
+  .rib-bar.y2026{background:linear-gradient(180deg,#E8917A,var(--clay));}
+  .rib-bar .tip{position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%);background:var(--paper); color:var(--ink); font-family:'IBM Plex Mono',monospace;font-size:.68rem; padding:.4rem .55rem; border-radius:4px; white-space:nowrap;opacity:0; pointer-events:none; transition:opacity .15s; z-index:5;}
+  .rib-bar:hover .tip{opacity:1;}
+  .rib-bar.google-partner::before{content:"G"; position:absolute; top:-18px; left:50%; transform:translateX(-50%);
+    width:14px;height:14px;border-radius:50%;background:#4285F4;color:#fff;font-family:'IBM Plex Mono',monospace;
+    font-size:.55rem;line-height:14px;text-align:center;font-weight:700;}
+  .ribbon-ticks{display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:3px; margin-top:.5rem;}
+  .ribbon-ticks span{font-family:'IBM Plex Mono',monospace; font-size:.6rem; color:#7C7891; writing-mode:vertical-rl; transform:rotate(180deg); text-align:right; height:70px;}
+  .ribbon-legend{display:flex; gap:1.6rem; margin-top:1.4rem; font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:#A9A491;}
+  .ribbon-legend span{display:flex; align-items:center; gap:.4rem;}
+  .dot{width:9px;height:9px;border-radius:2px;display:inline-block;}
+
+  section.block{padding:4.6rem 6vw; border-bottom:1px solid var(--line-dark);}
+  section.block.dark{background:var(--ink); color:var(--paper); border-bottom:none;}
+  .kicker{font-family:'IBM Plex Mono',monospace; font-size:.72rem; text-transform:uppercase; letter-spacing:.14em;color:var(--clay); margin-bottom:.8rem; display:flex; align-items:center; gap:.6rem;}
+  .dark .kicker{color:var(--amber-soft);}
+  .kicker::before{content:"";width:22px;height:1px;background:currentColor;}
+  h2.title{font-size:clamp(1.7rem,3vw,2.5rem); font-weight:600; margin:0 0 1.2rem; max-width:22ch; letter-spacing:-.01em;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:3rem;}
+  .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:1.6rem;}
+  @media (max-width:860px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+  .stat-row{display:flex; flex-wrap:wrap; gap:1.4rem; margin:2rem 0;}
+  .stat-card{background:var(--paper-dim); border:1px solid var(--line-dark); border-radius:10px;padding:1.3rem 1.5rem; flex:1 1 200px; min-width:170px;}
+  .dark .stat-card{background:var(--ink-soft); border-color:var(--line);}
+  .stat-card .n{font-family:'Fraunces',serif; font-size:2rem; font-weight:600; line-height:1;}
+  .stat-card .l{font-family:'IBM Plex Mono',monospace; font-size:.68rem; text-transform:uppercase; letter-spacing:.05em; color:#6B6656; margin-top:.5rem;}
+  .dark .stat-card .l{color:#9A96A8;}
+  .stat-card .d{font-size:.82rem; color:#6B6656; margin-top:.3rem;}
+  .dark .stat-card .d{color:#B7B3C4;}
+
+  .chart-box{background:#fff; border:1px solid var(--line-dark); border-radius:12px; padding:1.6rem; margin:1.6rem 0;}
+  .dark .chart-box{background:var(--ink-soft); border-color:var(--line);}
+  .chart-box .cap{font-family:'IBM Plex Mono',monospace; font-size:.7rem; color:#8A8570; margin-top:.9rem;}
+  .dark .chart-box .cap{color:#9A96A8;}
+
+  .callout{border-left:3px solid var(--clay); background:var(--clay-soft);padding:1.3rem 1.5rem; border-radius:0 8px 8px 0; margin:1.6rem 0;}
+  .callout h4{margin:0 0 .5rem; font-family:'IBM Plex Mono',monospace; font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; color:var(--clay);}
+  .callout p{margin:0; font-size:.94rem; max-width:none;}
+  .callout.amber{border-left-color:var(--amber); background:#F3E4C4;}
+  .callout.amber h4{color:#8A6620;}
+  .callout.teal{border-left-color:var(--teal); background:#DCE7E1;}
+  .callout.teal h4{color:var(--teal);}
+
+  table{width:100%; border-collapse:collapse; margin:1.6rem 0; font-size:.9rem;}
+  th,td{text-align:left; padding:.6rem .7rem; border-bottom:1px solid var(--line-dark);}
+  th{font-family:'IBM Plex Mono',monospace; font-size:.65rem; text-transform:uppercase; letter-spacing:.05em; color:#6B6656;}
+  .dark th{color:#9A96A8;}
+  tr:hover{background:rgba(0,0,0,.03);}
+  .dark tr:hover{background:rgba(255,255,255,.03);}
+  td.num, th.num{text-align:right; font-family:'IBM Plex Mono',monospace;}
+  tr.total-row{font-weight:600; background:rgba(203,154,70,.12);}
+
+  .case-card{border:1px solid var(--line-dark); border-radius:12px; padding:1.6rem; background:#fff;}
+  .case-card h3{font-size:1.15rem; margin:.3rem 0 .8rem;}
+  .case-card .tag{font-family:'IBM Plex Mono',monospace; font-size:.65rem; text-transform:uppercase; color:var(--amber); letter-spacing:.06em;}
+  .case-card ul{padding-left:1.1rem; margin:.6rem 0 0; font-size:.88rem;}
+  .case-card li{margin-bottom:.35rem;}
+
+  .roadmap{counter-reset:step; margin-top:2rem;}
+  .step{display:grid; grid-template-columns:64px 1fr; gap:1.2rem;padding:1.6rem 0; border-top:1px solid var(--line);}
+  .step:first-child{border-top:none;}
+  .step .num{counter-increment:step; font-family:'Fraunces',serif; font-size:1.8rem; color:var(--amber-soft);}
+  .step .num::before{content: counter(step, decimal-leading-zero);}
+  .step h3{margin:.1rem 0 .5rem; font-size:1.15rem; color:var(--paper);}
+  .step p{color:#C6C2D4; font-size:.94rem; max-width:64ch;}
+
+  footer{padding:3rem 6vw; background:var(--ink); color:#7C7891; font-family:'IBM Plex Mono',monospace; font-size:.72rem; border-top:1px solid var(--line);}
+  footer a{color:var(--amber-soft); text-decoration:none;}
+
+  .pill{display:inline-block; padding:.2rem .6rem; border-radius:20px; font-family:'IBM Plex Mono',monospace; font-size:.65rem; text-transform:uppercase; letter-spacing:.05em;}
+  .pill.ok{background:#DCE7E1; color:var(--teal);}
+  .pill.warn{background:var(--clay-soft); color:var(--clay);}
+  .pill.info{background:#E4DEC9; color:#8A6620;}
+
+  .toggle-row{display:flex; gap:.5rem; margin:1.2rem 0 0;}
+  .toggle-btn{font-family:'IBM Plex Mono',monospace; font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; padding:.5rem 1rem; border-radius:20px; border:1px solid var(--line-dark); background:transparent; color:var(--ink); cursor:pointer;}
+  .dark .toggle-btn{border-color:var(--line); color:var(--paper);}
+  .toggle-btn.active{background:var(--clay); border-color:var(--clay); color:#fff;}
+  .dark .toggle-btn.active{background:var(--amber); border-color:var(--amber); color:var(--ink);}
+
+  /* ---- SVG charts (no external dependency) ---- */
+  .schart-wrap{position:relative;}
+  .schart{width:100%; height:auto; display:block; overflow:visible;}
+  .schart .grid-line{stroke:rgba(0,0,0,.08);}
+  .dark .schart .grid-line{stroke:rgba(255,255,255,.1);}
+  .schart .zero-line{stroke:#8A8570; stroke-width:1.4; stroke-dasharray:4 4;}
+  .schart .axis-label{fill:#8A8570; font-family:'IBM Plex Mono',monospace; font-size:9.5px;}
+  .dark .schart .axis-label{fill:#9A96A8;}
+  .schart .y-axis-title{fill:#6B6656; font-family:'IBM Plex Mono',monospace; font-size:10px;}
+  .dark .schart .y-axis-title{fill:#B7B3C4;}
+  .schart .mark{cursor:pointer;}
+  .schart .mark:hover{filter:brightness(1.12);}
+  .schart-legend{display:flex; flex-wrap:wrap; gap:1.3rem; margin:1rem 0 0; font-family:'IBM Plex Mono',monospace; font-size:.7rem; color:#6B6656;}
+  .dark .schart-legend{color:#C6C2D4;}
+  .schart-legend span{display:flex; align-items:center; gap:.45rem;}
+  .schart-legend i{width:10px; height:10px; border-radius:2px; display:inline-block; flex:none;}
+  .schart-legend i.ln{height:3px; border-radius:2px;}
+  .schart-tooltip{position:absolute; background:var(--ink); color:var(--paper); font-family:'IBM Plex Mono',monospace; font-size:.68rem; padding:.5rem .7rem; border-radius:6px; pointer-events:none; opacity:0; transition:opacity .1s ease; z-index:20; white-space:nowrap; line-height:1.6; box-shadow:0 6px 18px rgba(0,0,0,.22); transform:translate(-50%,-100%);}
+  .dark .schart-tooltip{background:var(--paper); color:var(--ink);}
+  .schart-tooltip.show{opacity:1;}
+  .schart-tooltip b{color:var(--amber-soft);}
+  .dark .schart-tooltip b{color:var(--clay);}
+  .schart-note{font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:#8A8570; margin-top:.6rem;}
+  .dark .schart-note{color:#9A96A8;}
+
+  /* ---- Collapsible master table ---- */
+  .table-toggle{display:inline-flex; align-items:center; gap:.55rem; font-family:'IBM Plex Mono',monospace; font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; color:var(--clay); background:var(--paper-dim); border:1px solid var(--line-dark); border-radius:8px; padding:.75rem 1.15rem; cursor:pointer; margin-top:.4rem;}
+  .table-toggle:hover{background:#E2DAC4;}
+  .table-toggle .arrow{display:inline-block; transition:transform .2s ease; font-size:.85em;}
+  .table-toggle.open .arrow{transform:rotate(90deg);}
+  .table-collapse{max-height:0; overflow:hidden; transition:max-height .35s ease;}
+  .table-collapse.open{max-height:5000px;}
+
+  .pill.hypo{background:#E4DEC9; color:#8A6620; border:1px dashed #C7A45B;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">Estudo de Comportamento de Compra · Imersões · Jan/24 – Ago/26</div>
+  <h1>A venda não some.<br><em>Ela demora. E agora custa mais para chegar.</em></h1>
+  <p class="lede">Dezoito imersões, 1,69 milhão de leads, R$ 7,46 milhões investidos e R$ 38,4 milhões em receita gerada. O recorte que mais importa não é quanto custa captar um lead; é quanto tempo leva, e quanto sobra, até esse lead virar retorno.</p>
+  <div class="hero-meta">
+    <div>Leads captados<strong>1.691.671</strong></div>
+    <div>Investimento em mídia<strong>R$ 7,46 mi</strong></div>
+    <div>Receita gerada<strong>R$ 38,4 mi</strong></div>
+    <div>ROAS 365D, 2024 → 2026<strong>7,4x → 2,7x*</strong></div>
+  </div>
+</header>
+
+<div class="ribbon-wrap">
+  <div class="ribbon-label">Linha do tempo · CPL por imersão (altura = custo por lead)</div>
+  <div class="ribbon" id="ribbon"></div>
+  <div class="ribbon-ticks" id="ribbonTicks"></div>
+  <div class="ribbon-legend">
+    <span><i class="dot" style="background:#6C74A0"></i>2024 (5 imersões)</span>
+    <span><i class="dot" style="background:var(--amber)"></i>2025 (9 imersões)</span>
+    <span><i class="dot" style="background:var(--clay)"></i>2026 parcial (4 imersões)</span>
+    <span><i class="dot" style="background:#4285F4;border-radius:50%;"></i>Parceria de mídia com o Google (8 imersões: 3 em 2024, 5 em 2025, nenhuma em 2026)</span>
+  </div>
+</div>
+
+<!-- ============ SUMÁRIO EXECUTIVO ============ -->
+<section class="block">
+  <div class="kicker">Sumário executivo</div>
+  <h2 class="title">O funil amadureceu. O retorno, também. Só que na direção errada</h2>
+  <div class="grid2">
+    <div>
+      <p>A maior parte da receita das Imersões nasce depois do 7º dia. Isso já é conhecido. O que este estudo isola pela primeira vez é o cruzamento entre <strong>investimento por imersão e retorno por janela de tempo</strong>. E o quadro que aparece é mais sério do que "o lead demora": o retorno sobre cada real investido está caindo, ano após ano.</p>
+      <p>O <strong>CPL médio ponderado</strong> (investimento ÷ leads, por ano) saiu de <strong>R$ 3,64</strong> em 2024 para <strong>R$ 5,05</strong> em 2025 - alta de 38%. Em 2026 recuou um pouco, para <strong>R$ 4,65</strong>, mas segue 28% acima do piso de 2024.</p>
+    </div>
+    <div>
+      <p>Mais revelador: em 2024, a primeira semana de vendas já <strong>pagava a campanha</strong> (ROAS de 7 dias = 1,13x). Em 2025 e 2026, isso não acontece mais. O ROAS de 7 dias caiu para 0,81x e 0,67x. Hoje, o breakeven só chega entre os dias 8 e 30. E o retorno em 365 dias, que era de <strong>7,43x</strong> em 2024, caiu para <strong>4,29x</strong> em 2025 e projeta algo bem mais modesto em 2026.</p>
+      <p>Isso muda a pergunta estratégica: não é mais "por que a conversão em 7 dias caiu", é <strong>"por que o retorno total caiu, mesmo com a cauda longa entregando"</strong>.</p>
+    </div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-card"><div class="n">3,64 → 5,05 → 4,65</div><div class="l">CPL ponderado (R$), 2024→25→26</div><div class="d">alta de 38% e depois recuo parcial</div></div>
+    <div class="stat-card"><div class="n">7,43x → 4,29x</div><div class="l">ROAS em 365 dias, 2024 → 2025</div><div class="d">queda de 42% no retorno total</div></div>
+    <div class="stat-card"><div class="n">1,13x → 0,81x → 0,67x</div><div class="l">ROAS em 7 dias, por ano</div><div class="d">só 2024 já era lucrativo na 1ª semana</div></div>
+    <div class="stat-card"><div class="n">76%</div><div class="l">queda de leads na linha "IA"</div><div class="d">307,5k (Mai/24) → 73,1k (Mai/26)</div></div>
+  </div>
+</section>
+
+<!-- ============ CPL & ROAS ============ -->
+<section class="block">
+  <div class="kicker">Topo de funil & retorno</div>
+  <h2 class="title">O leilão ficou mais caro, mas o problema real é o retorno</h2>
+  <p>Olhando imersão a imersão, o CPL oscila muito (de R$ 4,60 a R$ 14,17) conforme tema e sazonalidade. Mas o número que realmente importa para decisão de investimento é o <strong>CPL ponderado por leads</strong> e o <strong>ROAS acumulado</strong>. E é aí que a curva preocupa.</p>
+  <div class="chart-box">
+    <div id="cplChart"></div>
+    <div class="schart-legend" id="cplChartLegend"></div>
+    <div class="cap">CPL por imersão, em ordem cronológica. A cor do ponto marca o ano de captação.</div>
+  </div>
+  <div class="chart-box">
+    <div id="roasChart"></div>
+    <div class="schart-legend" id="roasChartLegend"></div>
+    <div class="cap">ROAS acumulado por janela de tempo, por ano de captação. A linha tracejada em 1,0x é o ponto de equilíbrio (breakeven). 2026 ainda não tem dado de 365 dias; a curva é parcial.</div>
+  </div>
+  <div class="grid2">
+    <div class="callout">
+      <h4>O breakeven mudou de semana</h4>
+      <p>Em 2024, a imersão média já era lucrativa na primeira semana (ROAS 1,13x aos 7 dias). Em 2025 e 2026, o breakeven só chega entre os dias 8 e 30 (ROAS de 7 dias abaixo de 1,0x nos dois anos). Isso significa que qualquer decisão de corte de campanha baseada só na primeira semana hoje mataria uma campanha que, historicamente, ainda vai virar lucro.</p>
+    </div>
+    <div class="callout teal">
+      <h4>Melhor eficiência histórica</h4>
+      <p><strong>IA 2</strong> (Mai/24) segue como o ponto ótimo: R$ 4,60 de CPL para 307,5 mil leads, o maior volume da série — e um dos poucos casos com ROAS de 7 dias já positivo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CAUDA LONGA — DUAS VISÕES ============ -->
+<section class="block dark">
+  <div class="kicker">Jornada de conversão</div>
+  <h2 class="title">Duas formas de medir a cauda. E por que as duas importam</h2>
+  <p style="color:#C6C2D4">Existem duas formas igualmente válidas de olhar para a cauda longa, e elas contam histórias diferentes. Uma mede o <strong>portfólio completo</strong>, incluindo as imersões de outubro/novembro turbinadas por Black Friday. A outra isola as imersões <strong>fora do calendário de Black Friday</strong> (excluindo Back-End 2024 e Dev 10 – Google 2025), que convertem por urgência sazonal, não pela imersão em si.</p>
+  <div class="toggle-row">
+    <button class="toggle-btn active" data-view="full">Portfólio completo</button>
+    <button class="toggle-btn" data-view="exbf">Ex-Black Friday</button>
+  </div>
+  <div class="chart-box">
+    <div id="windowChart"></div>
+    <div class="schart-legend" id="windowChartLegend"></div>
+    <div class="cap" id="windowCap">Distribuição de vendas por janela de tempo, como % do total do ano (portfólio completo, incluindo turmas de Black Friday).</div>
+  </div>
+  <div class="stat-row" id="caudaStats">
+    <div class="stat-card"><div class="n">84,8%</div><div class="l">2024 · receita pós-7 dias</div></div>
+    <div class="stat-card"><div class="n">81,1%</div><div class="l">2025 · receita pós-7 dias</div></div>
+    <div class="stat-card"><div class="n">74,8%*</div><div class="l">2026 · receita pós-7 dias (parcial)</div></div>
+  </div>
+  <div class="callout amber" style="color:var(--ink)">
+    <h4>O que cada visão mostra</h4>
+    <p><strong>Portfólio completo</strong> é o número certo para planejar caixa e meta comercial do ano — inclui o efeito real de reativação de Black Friday. <strong>Ex-Black Friday</strong> é o número certo para avaliar a saúde da imersão em si, sem o empurrão sazonal. Nessa segunda visão, o padrão é mais dramático: 8,5% das vendas em 7 dias em 2024 contra 20,3% em 2025 e 25,2% em 2026 (parcial) — sugerindo que, fora da Black Friday, a conversão imediata vem de fato subindo, o que também pode ser efeito de censura estatística nas turmas mais recentes (ver nota abaixo).</p>
+  </div>
+  <div class="callout" style="border-left-color:var(--clay); background:rgba(168,70,47,.14); color:var(--paper)">
+    <h4 style="color:#E8917A">Por que 2026 ainda não é comparável</h4>
+    <p style="color:#D8D4C4">Imersões como <strong>Arquitetura Web</strong> (Jul/26) ainda não completaram 90 dias de vida na data desta análise; as janelas de 120, 180 e 210 dias simplesmente ainda não aconteceram. O % de "vendas em 7 dias" de 2026 está inflado porque é a fatia mais completa do funil que já existe — não porque o comportamento mudou.</p>
+  </div>
+</section>
+
+<!-- ============ ESTUDOS DE CASO ============ -->
+<section class="block">
+  <div class="kicker">Estudos de caso</div>
+  <h2 class="title">Imersões e algumas lições</h2>
+  <div class="grid3">
+    <div class="case-card">
+      <div class="tag">Recorde de escala</div>
+      <h3>IA 2 — Mai/24</h3>
+      <span class="pill info" style="display:inline-block;margin:.2rem 0 .2rem;">Parceria de mídia com o Google</span>
+      <ul>
+        <li><strong>307.509 leads</strong>, o maior volume da série, a CPL de R$ 4,60 (R$ 705.250 investidos) — turma realizada em parceria de mídia paga com o Google</li>
+        <li>Apenas <strong>5,2%</strong> das 6.035 vendas do ano aconteceram em 7 dias</li>
+        <li>ROAS de 365 dias entre os mais altos da série — piso de custo nunca mais repetido</li>
+        <li><span class="pill hypo">Hipótese a validar</span> abr–mai/2024 foi um pico de procura de mercado por IA generativa; parte do volume recorde pode refletir esse timing sazonal, além da parceria de mídia — recomenda-se cruzar com dados de tendência de busca do período antes de tratar este CPL como piso replicável</li>
+      </ul>
+    </div>
+    <div class="case-card">
+      <div class="tag">Parceria com o Google</div>
+      <h3>A queda em cascata da linha "IA"</h3>
+      <ul>
+        <li>Parceria de mídia com o Google: <strong>3 imersões em 2024</strong> (IA 2, Dev 8, Back-End), <strong>5 em 2025</strong> (Gemini II, DevOps, Agentes de IA, Gemini III, Dev 10) e <strong>nenhuma em 2026</strong></li>
+        <li>IA 2 (Mai/24, Google): <strong>307,5 mil</strong> leads</li>
+        <li>Gemini II (Mai/25, Google): <strong>180,3 mil</strong> <span class="pill warn">−41%</span></li>
+        <li>Gemini III (Set/25, Google, BF): <strong>116,2 mil</strong> <span class="pill warn">−36%</span></li>
+        <li>IA 5ed (Mai/26, sem Google): <strong>73,1 mil</strong> <span class="pill warn">−37%</span></li>
+        <li>Queda acumulada de <strong>76%</strong> em quatro edições — coincide com o fim da parceria de mídia paga com o Google</li>
+      </ul>
+    </div>
+    <div class="case-card">
+      <div class="tag">Cauda consistente</div>
+      <h3>Dados com Python — Jul/25</h3>
+      <ul>
+        <li><strong>70.952 leads</strong> a CPL R$ 5,89 (R$ 244.010) — um dos melhores custos de 2025</li>
+        <li>394 vendas em 7 dias vs. <strong>326 vendas</strong> só na janela de 120 dias — quase o mesmo volume, quatro meses depois</li>
+        <li>Mostra que temas de nicho (Dados/IA) sustentam venda ao longo do ano melhor que temas saturados</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout teal" style="margin-top:1.6rem;">
+    <h4>Nicho não é garantia de performance</h4>
+    <p>Nem todo "nicho" se comporta da mesma forma. <strong>Dados com Python</strong> é nicho técnico com demanda ampla e sustenta cauda longa consistente — ver case acima. Já <strong>Mobile</strong> (13,9 mil leads) e <strong>Arquitetura Web</strong> (30,6 mil leads) são os dois <strong>menores volumes de captação</strong> de toda a série de 18 imersões — sinal de público endereçável estruturalmente menor, que pressiona CPL, escala e receita total desde o topo de funil, independentemente de sazonalidade. Antes de repetir esses formatos, vale segmentar "nicho com demanda comprovada" (investir mais) de "nicho de público restrito" (tratar como aposta pequena e deliberada, não como padrão de calendário).</p>
+  </div>
+  <div class="callout amber" style="color:var(--ink)">
+    <h4>Google não explica toda a alta de CPL</h4>
+    <p>É tentador atribuir o CPL mais alto só à perda da parceria com o Google — mas os números não fecham essa conta sozinhos. Em 2025, <strong>5 das 9 imersões</strong> ainda tinham mídia via Google e, mesmo assim, o CPL ponderado subiu para R$ 5,05. Em 2026, <strong>nenhuma</strong> imersão teve parceria com o Google e o CPL ponderado <strong>caiu</strong> para R$ 4,65 — abaixo de 2025. Isso sugere que mix de canais, saturação de temas e leilão de mídia paga como um todo pesam tanto quanto (ou mais que) a presença isolada do Google nesta conta.</p>
+  </div>
+  <div class="callout" style="margin-top:1.6rem;">
+    <h4>Nota de dados — Imersão Mobile (Mar/25)</h4>
+    <p>13.902 leads captados a CPL R$ 11,37 (R$ 96.090 investidos). Os dados de conversão por janela de tempo não estão disponíveis para esta análise — não se trata de vendas zeradas, e sim de ausência de registro no momento do estudo.</p>
+  </div>
+</section>
+
+<!-- ============ CANAIS ============ -->
+<section class="block">
+  <div class="kicker">Mix de canais</div>
+  <h2 class="title">A dependência de mídia paga aumentou</h2>
+  <p>A fatia de leads vinda de canais orgânicos e influenciadores caiu de forma quase monotônica ao longo da série: de <strong>23,8%</strong> da base na primeira imersão (Front-End, Jan/24) para <strong>2,8%</strong> na mais recente com dados completos (Arquitetura Web, Jul/26). Isso ajuda a explicar por que o CPL ponderado subiu mesmo com CPLs individuais melhorando em alguns temas: menos leads "grátis" na mistura significa que a mídia paga carrega uma fatia maior da conta.</p>
+  <div class="chart-box">
+    <div id="channelChart"></div>
+    <div class="schart-legend" id="channelChartLegend"></div>
+    <div class="cap">Soma de leads via Social Orgânico + Influenciadores, como % dos leads totais de cada imersão, em ordem cronológica. A cor marca o ano de captação.</div>
+  </div>
+</section>
+
+<!-- ============ TABELA MESTRA ============ -->
+<section class="block">
+  <div class="kicker">Base consolidada</div>
+  <h2 class="title">As 18 imersões, com investimento por turma</h2>
+  <p>Tabela de referência com investimento, CPL e vendas de cada imersão, mais o total ponderado por ano (linhas em destaque).</p>
+  <button class="table-toggle" id="tableToggleBtn" type="button" aria-expanded="false">
+    <span class="arrow">▸</span><span id="tableToggleLabel">Ver as 18 imersões em detalhe</span>
+  </button>
+  <div class="table-collapse" id="tableCollapse">
+  <div style="overflow-x:auto;">
+  <table id="masterTable">
+    <thead><tr>
+      <th>Ano</th><th>Imersão</th><th>Período</th><th class="num">Leads</th><th class="num">Investimento</th><th class="num">CPL</th>
+      <th class="num">Vendas 7d</th><th class="num">Vendas totais</th><th class="num">% em 7d</th>
+    </tr></thead>
+    <tbody></tbody>
+  </table>
+  </div>
+  </div>
+</section>
+
+<!-- ============ ROADMAP ============ -->
+<section class="block dark">
+  <div class="kicker">Recomendações</div>
+  <h2 class="title">Quatro mudanças para proteger o retorno, não só o volume</h2>
+  <div class="roadmap">
+    <div class="step">
+      <div class="num"></div>
+      <div>
+        <h3>Trocar o KPI principal de "Vendas 7D" para ROAS acumulado de 90–180 dias</h3>
+        <p>Com o breakeven de 7 dias abaixo de 1,0x desde 2025, medir sucesso pela primeira semana estatisticamente garante a leitura de "fracasso" mesmo em campanhas saudáveis.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="num"></div>
+      <div>
+        <h3>Definir meta de CPL por ROAS-alvo, não por benchmark histórico isolado</h3>
+        <p>Usar a curva de ROAS por janela (7/30/90/180/365 dias) para calcular o CPL máximo sustentável por tema, em vez de comparar contra o piso histórico de R$ 4,60 — que não se repete desde Mai/24.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="num"></div>
+      <div>
+        <h3>Construir réguas de nutrição a partir do 8º dia</h3>
+        <p>Conteúdo técnico aprofundado entre os dias 15–45, com ofertas de downsell e assinatura recorrente para quem não converteu nas primeiras duas semanas — é exatamente a janela em que o ROAS cruza de deficitário para lucrativo.</p>
+      </div>
+    </div>
+    </div>
+    <div class="step">
+      <div class="num"></div>
+      <div>
+        <h3>Sincronizar réguas com Black Friday, mas não confundir os dois efeitos</h3>
+        <p>Imersões de outubro/novembro mostram conversão em 7 dias muito acima da média — mas isso é reativação de base antiga, não um novo padrão de urgência. Reportar os dois recortes (completo e ex-BF) lado a lado evita essa confusão em decisões futuras.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Estudo elaborado a partir da base consolidada de leads, investimento, vendas e canais de aquisição das Imersões Alura, janeiro de 2024 a 03 de agosto de 2026.</p>
+</footer>
+
+<script>
+const immersions = [
+  {year:2024, name:'Front-End', period:'04/01–21/01', leads:75101, invest:180350, cpl:9.20, v7:121, total:2082},
+  {year:2024, name:'Python', period:'04/03–24/03', leads:76040, invest:231410, cpl:8.07, v7:107, total:2087},
+  {year:2024, name:'IA 2 Google', period:'15/04–05/05', leads:307509, invest:705250, cpl:4.60, v7:315, total:6035},
+  {year:2024, name:'Dev 8 Google', period:'12/08–01/09', leads:128654, invest:650830, cpl:8.53, v7:590, total:3055},
+  {year:2024, name:'Back-End Google (BF)', period:'28/10–17/11', leads:120372, invest:811510, cpl:11.84, v7:1321, total:2859},
+  {year:2025, name:'Front-End 2', period:'06/01–26/01', leads:82893, invest:311690, cpl:6.69, v7:438, total:1769},
+  {year:2025, name:'Dev 9', period:'10/03–30/03', leads:81078, invest:309700, cpl:6.02, v7:351, total:1601},
+  {year:2025, name:'Mobile', period:'31/03–13/04', leads:13902, invest:96090, cpl:11.37, v7:null, total:null},
+  {year:2025, name:'IA – Gemini II Google', period:'22/04–11/05', leads:180342, invest:714190, cpl:5.97, v7:660, total:2564},
+  {year:2025, name:'DevOps Google', period:'09/06–29/06', leads:62852, invest:555720, cpl:13.08, v7:220, total:1484},
+  {year:2025, name:'Dados com Python', period:'14/07–03/08', leads:70952, invest:244010, cpl:5.89, v7:394, total:2000},
+  {year:2025, name:'Dev Agentes de IA Google', period:'18/08–07/09', leads:81289, invest:266450, cpl:5.22, v7:295, total:1731},
+  {year:2025, name:'IA – Gemini III Google', period:'15/09–05/10', leads:116165, invest:591910, cpl:6.44, v7:191, total:1425},
+  {year:2025, name:'Dev 10 – Google BF', period:'27/10–16/11', leads:74069, invest:765370, cpl:14.17, v7:146, total:1710},
+  {year:2026, name:'Dados com Python 2', period:'05/01–25/01', leads:70653, invest:246380, cpl:5.28, v7:262, total:1107},
+  {year:2026, name:'Front-End 3', period:'02/03–23/03', leads:46074, invest:209100, cpl:11.19, v7:86, total:397},
+  {year:2026, name:'IA', period:'04/05–25/05', leads:73142, invest:364020, cpl:7.99, v7:101, total:219},
+  {year:2026, name:'Arquitetura Web', period:'22/06–13/07', leads:30584, invest:204970, cpl:9.85, v7:24, total:155},
+];
+const yearTotals = {
+  2024:{leads:707676, invest:2579350, cpl:3.6448176849292615, v7:2454, total:16118},
+  2025:{leads:763542, invest:3855130, cpl:5.049008436994953, v7:2695, total:14284},
+  2026:{leads:220453, invest:1024470, cpl:4.647112990070446, v7:473, total:1878},
+};
+
+// ---- Timeline ribbon ----
+const ribbon = document.getElementById('ribbon');
+const ticks = document.getElementById('ribbonTicks');
+const maxCpl = Math.max(...immersions.map(d=>d.cpl));
+immersions.forEach(d=>{
+  const isGoogle = d.name.includes('Google');
+  const bar = document.createElement('div');
+  bar.className = 'rib-bar y'+d.year + (isGoogle ? ' google-partner' : '');
+  bar.style.height = Math.max(8, (d.cpl/maxCpl*100)) + '%';
+  const tip = document.createElement('div');
+  tip.className = 'tip';
+  tip.textContent = d.name + ' — R$ ' + d.cpl.toFixed(2) + (isGoogle ? ' · parceria Google' : '');
+  bar.appendChild(tip);
+  ribbon.appendChild(bar);
+  const t = document.createElement('span');
+  t.textContent = d.name;
+  ticks.appendChild(t);
+});
+
+// ---- Master table ----
+const tbody = document.querySelector('#masterTable tbody');
+function fmtBRL(v){ return 'R$ ' + v.toLocaleString('pt-BR'); }
+immersions.forEach(d=>{
+  const tr = document.createElement('tr');
+  const pct7 = d.total ? (100*d.v7/d.total).toFixed(1)+'%' : '—';
+  tr.innerHTML = `<td>${d.year}</td><td>${d.name}</td><td class="mono">${d.period}</td>
+    <td class="num">${d.leads.toLocaleString('pt-BR')}</td>
+    <td class="num">${fmtBRL(d.invest)}</td>
+    <td class="num">R$ ${d.cpl.toFixed(2)}</td>
+    <td class="num">${d.v7 ?? '—'}</td>
+    <td class="num">${d.total ?? '—'}</td>
+    <td class="num">${pct7}</td>`;
+  tbody.appendChild(tr);
+});
+[2024,2025,2026].forEach(y=>{
+  const d = yearTotals[y];
+  const tr = document.createElement('tr');
+  tr.className = 'total-row';
+  tr.innerHTML = `<td>${y}</td><td>TOTAL ${y===2026?'(parcial)':''}</td><td class="mono">—</td>
+    <td class="num">${d.leads.toLocaleString('pt-BR')}</td>
+    <td class="num">${fmtBRL(d.invest)}</td>
+    <td class="num">R$ ${d.cpl.toFixed(2)}</td>
+    <td class="num">${d.v7}</td>
+    <td class="num">${d.total}</td>
+    <td class="num">${(100*d.v7/d.total).toFixed(1)}%</td>`;
+  tbody.appendChild(tr);
+});
+
+// ==================================================================
+// Motor de gráficos SVG, sem dependência externa (sem CDN de terceiros)
+// ==================================================================
+const SVGNS = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs){
+  const el = document.createElementNS(SVGNS, tag);
+  for(const k in attrs) el.setAttribute(k, attrs[k]);
+  return el;
+}
+function chartWrap(containerId){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'schart-wrap';
+  container.appendChild(wrap);
+  const tip = document.createElement('div');
+  tip.className = 'schart-tooltip';
+  wrap.appendChild(tip);
+  return {container, wrap, tip};
+}
+function positionTip(wrap, tip, clientX, clientY, html){
+  const r = wrap.getBoundingClientRect();
+  tip.innerHTML = html;
+  tip.style.left = Math.max(40, Math.min(r.width-40, clientX - r.left)) + 'px';
+  tip.style.top = (clientY - r.top - 12) + 'px';
+  tip.classList.add('show');
+}
+function hideTip(tip){ tip.classList.remove('show'); }
+function legendHTML(items){
+  return items.map(it=>{
+    if(it.line){
+      const style = `width:16px;height:0;border-top:3px ${it.dash?'dashed':'solid'} ${it.color};display:inline-block;`;
+      return `<span><i style="${style}"></i>${it.label}</span>`;
+    }
+    return `<span><i style="background:${it.color};"></i>${it.label}</span>`;
+  }).join('');
+}
+
+function drawLineChart(containerId, opts){
+  const {series, categories, yFmt=(v)=>v.toFixed(1), yMax, yMin=0, height=320, rotate=false} = opts;
+  const {wrap, tip, container} = chartWrap(containerId);
+  const width = Math.max(container.clientWidth || 0, 320);
+  const padL = 46, padR = 16, padT = 14, padB = rotate ? 76 : 34;
+  const plotW = width - padL - padR, plotH = height - padT - padB;
+  const allVals = series.flatMap(s=>s.data.filter(v=>v!=null));
+  const maxVal = yMax ?? Math.max(...allVals) * 1.08;
+  const minVal = yMin;
+  const svg = svgEl('svg',{viewBox:`0 0 ${width} ${height}`, class:'schart', role:'img'});
+  wrap.appendChild(svg);
+  const gridN = 4;
+  for(let i=0;i<=gridN;i++){
+    const v = minVal + (maxVal-minVal)*i/gridN;
+    const y = padT + plotH - (v-minVal)/(maxVal-minVal)*plotH;
+    svg.appendChild(svgEl('line',{class:'grid-line', x1:padL, x2:width-padR, y1:y.toFixed(1), y2:y.toFixed(1)}));
+    const t = svgEl('text',{class:'axis-label', x:padL-8, y:(y+3).toFixed(1), 'text-anchor':'end'});
+    t.textContent = yFmt(v);
+    svg.appendChild(t);
+  }
+  const xStep = categories.length > 1 ? plotW/(categories.length-1) : 0;
+  categories.forEach((c,i)=>{
+    const x = padL + xStep*i;
+    const t = svgEl('text',{class:'axis-label', x:x.toFixed(1), y:(height-padB+14).toFixed(1), 'text-anchor': rotate ? 'end':'middle'});
+    if(rotate) t.setAttribute('transform', `rotate(-58 ${x.toFixed(1)} ${(height-padB+14).toFixed(1)})`);
+    t.textContent = c;
+    svg.appendChild(t);
+  });
+  series.forEach(s=>{
+    const pts = [];
+    s.data.forEach((v,i)=>{ if(v!=null) pts.push([padL+xStep*i, padT+plotH-(v-minVal)/(maxVal-minVal)*plotH, v, i]); });
+    if(pts.length===0) return;
+    const d = pts.map((p,idx)=> (idx===0?'M':'L')+p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+    if(s.fill){
+      const areaD = `M${pts[0][0].toFixed(1)},${(padT+plotH).toFixed(1)} `+pts.map(p=>'L'+p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')+` L${pts[pts.length-1][0].toFixed(1)},${(padT+plotH).toFixed(1)} Z`;
+      svg.appendChild(svgEl('path',{d:areaD, fill:s.color, opacity:'0.08', stroke:'none'}));
+    }
+    const path = svgEl('path',{d, fill:'none', stroke:s.color, 'stroke-width': s.width||2.4, 'stroke-linecap':'round', 'stroke-linejoin':'round'});
+    if(s.dash) path.setAttribute('stroke-dasharray', s.dash);
+    svg.appendChild(path);
+    pts.forEach(p=>{
+      const fillColor = s.pointColor ? s.pointColor(p[3]) : s.color;
+      const dot = svgEl('circle',{class:'mark', cx:p[0].toFixed(1), cy:p[1].toFixed(1), r: s.dash ? 3.4 : 4.6, fill:fillColor, stroke:'#fff', 'stroke-width':1.4});
+      const onMove = e=> positionTip(wrap, tip, e.clientX, e.clientY, `<b>${categories[p[3]]}</b><br>${s.name}: ${yFmt(p[2])}`);
+      dot.addEventListener('mouseenter', onMove);
+      dot.addEventListener('mousemove', onMove);
+      dot.addEventListener('mouseleave', ()=> hideTip(tip));
+      svg.appendChild(dot);
+    });
+  });
+  return svg;
+}
+
+function drawBarChart(containerId, opts){
+  const {series, categories, yFmt=(v)=>v.toFixed(0), yMax, height=320, rotate=false, colorFor} = opts;
+  const {wrap, tip, container} = chartWrap(containerId);
+  const width = Math.max(container.clientWidth || 0, 320);
+  const padL = 44, padR = 16, padT = 14, padB = rotate ? 80 : 34;
+  const plotW = width - padL - padR, plotH = height - padT - padB;
+  const allVals = series.flatMap(s=>s.data.filter(v=>v!=null));
+  const maxVal = yMax ?? Math.max(...allVals) * 1.12;
+  const svg = svgEl('svg',{viewBox:`0 0 ${width} ${height}`, class:'schart', role:'img'});
+  wrap.appendChild(svg);
+  const gridN = 4;
+  for(let i=0;i<=gridN;i++){
+    const v = maxVal*i/gridN;
+    const y = padT + plotH - v/maxVal*plotH;
+    svg.appendChild(svgEl('line',{class:'grid-line', x1:padL, x2:width-padR, y1:y.toFixed(1), y2:y.toFixed(1)}));
+    const t = svgEl('text',{class:'axis-label', x:padL-8, y:(y+3).toFixed(1), 'text-anchor':'end'});
+    t.textContent = yFmt(v);
+    svg.appendChild(t);
+  }
+  const nCat = categories.length, nSeries = series.length;
+  const groupW = plotW/nCat;
+  const barGap = 3;
+  const barW = Math.max(4, (groupW - barGap*(nSeries+1))/nSeries);
+  categories.forEach((c,ci)=>{
+    const gx = padL + groupW*ci;
+    series.forEach((s,si)=>{
+      const v = s.data[ci];
+      if(v==null) return;
+      const bh = v/maxVal*plotH;
+      const x = gx + barGap + si*(barW+barGap);
+      const y = padT + plotH - bh;
+      const color = colorFor ? colorFor(s, si, ci) : s.color;
+      const rect = svgEl('rect',{class:'mark', x:x.toFixed(1), y:y.toFixed(1), width:barW.toFixed(1), height:Math.max(1,bh).toFixed(1), fill:color, rx:2});
+      const onMove = e=> positionTip(wrap, tip, e.clientX, e.clientY, `<b>${c}</b><br>${s.name}: ${yFmt(v)}`);
+      rect.addEventListener('mouseenter', onMove);
+      rect.addEventListener('mousemove', onMove);
+      rect.addEventListener('mouseleave', ()=> hideTip(tip));
+      svg.appendChild(rect);
+    });
+    const t = svgEl('text',{class:'axis-label', x:(gx+groupW/2).toFixed(1), y:(height-padB+14).toFixed(1), 'text-anchor': rotate?'end':'middle'});
+    if(rotate) t.setAttribute('transform', `rotate(-58 ${(gx+groupW/2).toFixed(1)} ${(height-padB+14).toFixed(1)})`);
+    t.textContent = c;
+    svg.appendChild(t);
+  });
+  return svg;
+}
+
+// ---- CPL chart ----
+drawLineChart('cplChart', {
+  categories: immersions.map(d=>d.name),
+  series: [{
+    name:'CPL',
+    data: immersions.map(d=>d.cpl),
+    color:'#A8462F',
+    fill:true,
+    pointColor:(i)=> immersions[i].year===2024 ? '#6C74A0' : immersions[i].year===2025 ? '#CB9A46' : '#A8462F'
+  }],
+  yFmt:(v)=>'R$ '+v.toFixed(1),
+  rotate:true,
+  height:340
+});
+document.getElementById('cplChartLegend').innerHTML = legendHTML([
+  {color:'#6C74A0', label:'2024'},
+  {color:'#CB9A46', label:'2025'},
+  {color:'#A8462F', label:'2026'},
+]);
+
+// ---- ROAS chart ----
+drawLineChart('roasChart', {
+  categories:['7 dias','30 dias','90 dias','180 dias','365 dias'],
+  series:[
+    {name:'ROAS 2024', data:[1.13,2.36,3.78,5.07,7.43], color:'#6C74A0'},
+    {name:'ROAS 2025', data:[0.81,1.56,2.42,3.21,4.29], color:'#CB9A46'},
+    {name:'ROAS 2026*', data:[0.67,1.44,2.14,2.65,null], color:'#A8462F', dash:'6 4'},
+    {name:'Breakeven (1,0x)', data:[1,1,1,1,1], color:'#8A8570', dash:'3 3', width:1.5},
+  ],
+  yFmt:(v)=>v.toFixed(1)+'x',
+  height:320
+});
+document.getElementById('roasChartLegend').innerHTML = legendHTML([
+  {color:'#6C74A0', label:'ROAS 2024', line:true},
+  {color:'#CB9A46', label:'ROAS 2025', line:true},
+  {color:'#A8462F', label:'ROAS 2026*', line:true, dash:true},
+  {color:'#8A8570', label:'Breakeven (1,0x)', line:true, dash:true},
+]);
+
+// ---- Window distribution chart (toggle full vs ex-BF) ----
+const windowLabels = ['Até 7d','8–14d','15–30d','31–60d','61–90d','91–120d','121–150d','151–180d','181d+'];
+const dataFull = {
+  2024:[15.2,11.9,4.7,8.1,10.9,6.4,6.0,4.9,31.8],
+  2025:[18.9,5.7,11.7,12.7,7.4,7.0,6.1,5.3,25.2],
+  2026:[25.2,10.0,19.2,18.3,8.1,10.5,4.4,4.3,0.2],
+};
+// visão ex-Black Friday: exclui Back-End (2024) e Dev 10 - Google (2025)
+const dataExBF = {
+  2024:[8.5,13.7,5.1,8.6,12.1,6.5,6.4,4.8,34.1],
+  2025:[20.3,4.8,9.4,11.5,7.5,7.1,6.3,5.7,27.6],
+  2026:[25.2,10.0,19.2,18.3,8.1,10.5,4.4,4.3,0.2],
+};
+function renderWindowChart(view){
+  const src = view==='full' ? dataFull : dataExBF;
+  drawBarChart('windowChart', {
+    categories: windowLabels,
+    series:[
+      {name:'2024', data:src[2024], color:'#6C74A0'},
+      {name:'2025', data:src[2025], color:'#CB9A46'},
+      {name:'2026*', data:src[2026], color:'#A8462F'},
+    ],
+    yFmt:(v)=>v.toFixed(0)+'%',
+    yMax:36,
+    height:340
+  });
+}
+renderWindowChart('full');
+document.getElementById('windowChartLegend').innerHTML = legendHTML([
+  {color:'#6C74A0', label:'2024'},
+  {color:'#CB9A46', label:'2025'},
+  {color:'#A8462F', label:'2026*'},
+]);
+const caudaFull = {2024:'84,8%',2025:'81,1%',2026:'74,8%*'};
+const caudaExBF = {2024:'91,5%',2025:'79,7%',2026:'74,8%*'};
+document.querySelectorAll('.toggle-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const view = btn.dataset.view;
+    renderWindowChart(view);
+    const cauda = view==='full' ? caudaFull : caudaExBF;
+    document.getElementById('windowCap').textContent = view==='full'
+      ? 'Distribuição de vendas por janela de tempo, como % do total do ano (portfólio completo, incluindo turmas de Black Friday).'
+      : 'Mesma distribuição, excluindo Back-End (2024) e Dev 10 – Google (2025), as turmas turbinadas por Black Friday.';
+    const cards = document.querySelectorAll('#caudaStats .n');
+    cards[0].textContent = cauda[2024];
+    cards[1].textContent = cauda[2025];
+    cards[2].textContent = cauda[2026];
+  });
+});
+
+// ---- Channel chart ----
+const channelData = [
+  {name:'Front-End', pct:23.79, year:2024},{name:'Python', pct:19.12, year:2024},{name:'IA 2', pct:10.69, year:2024},
+  {name:'Dev 8', pct:12.73, year:2024},{name:'Back-End', pct:10.51, year:2024},{name:'Front-End 2', pct:15.34, year:2025},
+  {name:'Dev 9', pct:16.53, year:2025},{name:'Mobile', pct:13.31, year:2025},{name:'Gemini II', pct:10.01, year:2025},
+  {name:'DevOps', pct:4.80, year:2025},{name:'Dados Python', pct:18.34, year:2025},{name:'Agentes IA', pct:9.28, year:2025},
+  {name:'Gemini III', pct:6.87, year:2025},{name:'Dev 10', pct:13.10, year:2025},{name:'Dados Python 2', pct:12.50, year:2026},
+  {name:'Front-End 3', pct:13.47, year:2026},{name:'IA 5', pct:3.96, year:2026},{name:'Arquit. Web', pct:2.79, year:2026},
+];
+const yearColor = {2024:'#6C74A0', 2025:'#CB9A46', 2026:'#A8462F'};
+drawBarChart('channelChart', {
+  categories: channelData.map(d=>d.name),
+  series:[{name:'% leads via orgânico + influenciadores', data:channelData.map(d=>d.pct), color:'#CB9A46'}],
+  colorFor:(s,si,ci)=> yearColor[channelData[ci].year],
+  yFmt:(v)=>v.toFixed(0)+'%',
+  rotate:true,
+  height:320
+});
+document.getElementById('channelChartLegend').innerHTML = legendHTML([
+  {color:'#6C74A0', label:'2024'},
+  {color:'#CB9A46', label:'2025'},
+  {color:'#A8462F', label:'2026'},
+]);
+
+// ---- Table collapse toggle ----
+const tableToggleBtn = document.getElementById('tableToggleBtn');
+const tableCollapse = document.getElementById('tableCollapse');
+const tableToggleLabel = document.getElementById('tableToggleLabel');
+tableToggleBtn.addEventListener('click', ()=>{
+  const isOpen = tableCollapse.classList.toggle('open');
+  tableToggleBtn.classList.toggle('open', isOpen);
+  tableToggleBtn.setAttribute('aria-expanded', String(isOpen));
+  tableToggleLabel.textContent = isOpen ? 'Ocultar a base consolidada' : 'Ver as 18 imersões em detalhe';
+});
+
+// Redesenha os gráficos responsivos se a janela for redimensionada
+let resizeTimer;
+window.addEventListener('resize', ()=>{
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(()=>{
+    drawLineChart('cplChart', {
+      categories: immersions.map(d=>d.name),
+      series: [{ name:'CPL', data: immersions.map(d=>d.cpl), color:'#A8462F', fill:true,
+        pointColor:(i)=> immersions[i].year===2024 ? '#6C74A0' : immersions[i].year===2025 ? '#CB9A46' : '#A8462F' }],
+      yFmt:(v)=>'R$ '+v.toFixed(1), rotate:true, height:340
+    });
+    drawLineChart('roasChart', {
+      categories:['7 dias','30 dias','90 dias','180 dias','365 dias'],
+      series:[
+        {name:'ROAS 2024', data:[1.13,2.36,3.78,5.07,7.43], color:'#6C74A0'},
+        {name:'ROAS 2025', data:[0.81,1.56,2.42,3.21,4.29], color:'#CB9A46'},
+        {name:'ROAS 2026*', data:[0.67,1.44,2.14,2.65,null], color:'#A8462F', dash:'6 4'},
+        {name:'Breakeven (1,0x)', data:[1,1,1,1,1], color:'#8A8570', dash:'3 3', width:1.5},
+      ], yFmt:(v)=>v.toFixed(1)+'x', height:320
+    });
+    const activeView = document.querySelector('.toggle-btn.active')?.dataset.view || 'full';
+    renderWindowChart(activeView);
+    drawBarChart('channelChart', {
+      categories: channelData.map(d=>d.name),
+      series:[{name:'% leads via orgânico + influenciadores', data:channelData.map(d=>d.pct), color:'#CB9A46'}],
+      colorFor:(s,si,ci)=> yearColor[channelData[ci].year],
+      yFmt:(v)=>v.toFixed(0)+'%', rotate:true, height:320
+    });
+  }, 200);
+});
+</script>
+</body>
+</html>
